@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 using UsersProject.Repositories;
 
 namespace UsersProject
@@ -23,7 +24,11 @@ namespace UsersProject
             services.AddTransient<ISalonUsersQueueRepository, SalonUsersQueueRepository>();
             services.AddCors();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
+                 {
+                     options.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+                     options.SerializerSettings.DateFormatString = "dd/MM/yyyy HH:mm";
+                 });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

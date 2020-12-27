@@ -11,6 +11,7 @@ namespace UsersProject.Models
         public string UserName { get; set; }
         public string UserFirstName { get; set; }
         public DateTime CreatedTime { get; set; }
+        public int SalonQueueId { get; set; }        
         public DateTime ArriveTime { get; set; }
     }
 }

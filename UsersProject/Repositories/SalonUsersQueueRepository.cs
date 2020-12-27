@@ -34,9 +34,17 @@ namespace UsersProject.Repositories
                 string sQuery = "[dbo].[GetSalonUsers] @CurrenTime";
                 conn.Open();
                 var result = await conn.QueryAsync<SalonUsersQueue>(sQuery, new { CurrenTime = currenTime });
+                //foreach(SalonUsersQueue salonUsersQueue in result)
+                //{
+                //    //salonUsersQueue.ArriveTime = ConvToDate(salonUsersQueue.ArriveTime);
+                //}
                 return result.ToList();
             }
         }
+
+         
+
+
         public async Task<int> AddSalonUser(SalonUser salonUser)
         {
             var retVal = 0;
