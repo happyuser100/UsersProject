@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import axios from "axios";
+import { _baseURL } from "./Utils";
 
 const LoginUser = () => {
 
@@ -29,7 +30,7 @@ const LoginUser = () => {
       try {
         debugger   
         const response = await axios.get(
-          `http://localhost:60567/api/salon/CheckSalonUser/${username}/${password}`
+          `${_baseURL}/CheckSalonUser/${username}/${password}`
         );
         console.log(response);
 

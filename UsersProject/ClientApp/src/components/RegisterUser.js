@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import axios from "axios";
+import { _baseURL } from "./Utils";
 
 const RegisterUser = () => {
 
@@ -36,7 +37,7 @@ const RegisterUser = () => {
             UserFirstName: userFirstName   
         };
 
-        const response = await axios.post("http://localhost:60567/api/salon/AddSalonUser",salonUser);
+        const response = await axios.post(`${_baseURL}/AddSalonUser`,salonUser);
         console.log(response);
         history.push("/");
 

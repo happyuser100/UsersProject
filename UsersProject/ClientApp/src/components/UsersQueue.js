@@ -3,26 +3,15 @@ import { useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
 import Popup from "./Popup";
+import {
+  buildHourOptions,
+  buildMinuteOptions,
+  getIsoDate,
+  pad,
+  _baseURL,
+} from "./Utils";
 
 const UsersQueue = () => {
-  const buildArray = (cnt) => {
-    var arr = [];
-
-    for (let i = 0; i <= cnt; i++) {
-      arr.push({ value: i, label: i });
-    }
-
-    return arr;
-  };
-
-  const buildHourOptions = () => {
-    return buildArray(23);
-  };
-
-  const buildMinuteOptions = () => {
-    return buildArray(59);
-  };
-
   const location = useLocation();
 
   const [users, setUser] = useState([]);
@@ -54,14 +43,19 @@ const UsersQueue = () => {
 
   useEffect(() => {
     debugger;
-    setsalonUserId(+location.state[0]);
-    setuserName(location.state[1]);
-  }, []);
+    if (location.state) {
+      setsalonUserId(+location.state[0]);
+      setuserName(location.state[1]);
+    }
+  }, [location.state]);
 
+  //"${_baseURL}/GetSalonUsers/2020-12-25T00:00:00"
   const loadUsers = async () => {
     try {
+      let d = new Date();
+      let currentTitme = d.toISOString();
       const result = await axios.get(
-        "http://localhost:60567/api/salon/GetSalonUsers/2020-12-25T00:00:00"
+        `${_baseURL}/GetSalonUsers/${currentTitme}`
       );
       setUser(result.data.reverse());
     } catch (error) {
@@ -77,9 +71,7 @@ const UsersQueue = () => {
 
   const deleteUserFromQueue = async (salonUserId) => {
     try {
-      await axios.delete(
-        `http://localhost:60567/api/salon/RemoveUserFromQueue/${salonUserId}`
-      );
+      await axios.delete(`${_baseURL}/RemoveUserFromQueue/${salonUserId}`);
       setaddEdit(1); //for add
       loadUsers();
     } catch (error) {
@@ -95,32 +87,6 @@ const UsersQueue = () => {
     setminuteSelValue(e.target.value);
   };
 
-  function pad(num, size) {
-    let s = num + "";
-    if (num < 10) {
-      while (s.length < size) s = "0" + s;
-    }
-    return s;
-  }
-
-  function getIsoDate(hour, minute) {
-    let separator = "-";
-    let separatorBlank = " ";
-    let separatorColon = ":";
-
-    let newDate = new Date();
-    let date = newDate.getDate();
-    let month = newDate.getMonth() + 1;
-    let year = newDate.getFullYear();
-
-    let dt = `${year}${separator}${
-      month < 10 ? `0${month}` : `${month}`
-    }${separator}${date}${separatorBlank}${hour}${separatorColon}${minute}`;
-
-    let dtISO = new Date(dt).toISOString();
-    return dtISO;
-  }
-
   const saveUserToQueue = async () => {
     debugger;
 
@@ -134,7 +100,7 @@ const UsersQueue = () => {
       ArriveTime: dtISO,
     };
 
-    let lnk = "http://localhost:60567/api/salon/AddUserToQueue";
+    let lnk = `${_baseURL}/AddUserToQueue`;
     if (addEdit === 1) {
       try {
         await axios.post(lnk, salonQueue);
@@ -143,7 +109,8 @@ const UsersQueue = () => {
       }
     } else {
       try {
-        lnk = `http://localhost:60567/api/salon/UpdateUserInQueue/${salonQueueId}`;
+        lnk = `${_baseURL}/UpdateUserInQueue/${salonQueueId}`;
+
         await axios.put(lnk, salonQueue);
       } catch (error) {
         console.error(error);
@@ -198,16 +165,18 @@ const UsersQueue = () => {
 
   const togglePopup = () => {
     setshowPopup(!showPopup);
-  }
+  };
 
   const populateTable = (user, index) => (
-    <tr onClick={() => displayPopup(user.salonUserId)}>
+    <tr key={index}>
       <th scope="row">{index + 1}</th>
-      <td>{user.salonUserId}</td>
-      <td>{user.userName}</td>
-      <td>{user.userFirstName}</td>
-      <td>{user.createdTime}</td>
-      <td>{user.arriveTime}</td>
+      <td onClick={() => displayPopup(user.salonUserId)}>{user.salonUserId}</td>
+      <td onClick={() => displayPopup(user.salonUserId)}>{user.userName}</td>
+      <td onClick={() => displayPopup(user.salonUserId)}>
+        {user.userFirstName}
+      </td>
+      <td onClick={() => displayPopup(user.salonUserId)}>{user.createdTime}</td>
+      <td onClick={() => displayPopup(user.salonUserId)}>{user.arriveTime}</td>
       <td>
         {user.salonUserId === salonUserId ? (
           <Link
@@ -326,8 +295,14 @@ const UsersQueue = () => {
           </React.Fragment>
         )}
 
-        {showPopup ? <Popup salonUserPopupData={salonUserPopupData} closePopup={togglePopup} /> : ""}
-
+        {showPopup ? (
+          <Popup
+            salonUserPopupData={salonUserPopupData}
+            closePopup={togglePopup}
+          />
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

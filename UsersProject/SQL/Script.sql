@@ -95,7 +95,11 @@ AS
 BEGIN
    SET NOCOUNT ON
 
-   IF NOT EXISTS ( SELECT [SalonUserId]  FROM [dbo].[SalonQueue] WHERE [SalonUserId] =  @SalonUserId)
+      --IF NOT EXISTS ( SELECT [SalonUserId]  FROM [dbo].[SalonQueue] WHERE [SalonUserId] =  @SalonUserId)
+     
+      DELETE FROM [SalonQueue]
+      WHERE [SalonUserId] = @SalonUserId 
+
      INSERT INTO [SalonQueue]
            ([SalonUserId],[ArriveTime])
      VALUES
